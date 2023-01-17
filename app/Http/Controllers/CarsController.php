@@ -16,8 +16,21 @@ class CarsController extends Controller
 
     public function index(Request $request)
     {
-        if ($request->only('per_page')['per_page'] == 'null') {
-            return Car::all();
+        if (!$request->only('per_page') || $request->only('per_page')['per_page'] == 'null' ) {
+            if (!$request->only('brand')&&!$request->only('model')) {
+                return Car::all();
+            }
+            if(!$request->only('model')){
+                $brand = $request->only('brand');
+                return  Car::searchByBrand($brand)->get();
+            }
+            if(!$request->only('brand')){
+                $model = $request->only('model');
+                return Car::searchByModel($model)->get();
+            }
+            $brandWithModel = $request->only('brand');
+            $modelWithBrand = $request->only('model');
+            return Car::searchByBrand($brandWithModel)->searchByModel($modelWithBrand)->get();
         };
 
         $per_page = $request->only('per_page');
