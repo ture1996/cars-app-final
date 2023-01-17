@@ -14,9 +14,16 @@ class CarsController extends Controller
         $this->middleware('auth');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        return Car::all();
+        if ($request->only('per_page')['per_page'] == 'null') {
+            return Car::all();
+        };
+
+        $per_page = $request->only('per_page');
+        $cars = Car::paginate($per_page['per_page']);
+        $cars->appends([$per_page])->links();
+        return $cars;
     }
 
     public function show($id)
